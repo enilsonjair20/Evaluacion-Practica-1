@@ -1,0 +1,102 @@
+const http = require('http');
+const url = require('url');
+const querystring = require('querystring');
+
+function renderFormPage() {
+    return `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Animal Favorito - Vista 1</title>
+            <style>
+                body { font-family: sans-serif; margin: 50px; }
+                form { border: 1px solid #ccc; padding: 20px; border-radius: 5px; max-width: 400px; }
+                input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+                input[type="submit"] { background-color: #4CAF50; color: white; padding: 14px 20px; margin: 8px 0; border: none; cursor: pointer; width: 100%; }
+            </style>
+        </head>
+        <body>
+            <h1>🐾 ¿Indica cual es tu animal favorito?</h1>
+            <form action="/mostrar-animal" method="POST">
+                <label for="animal">Nombre del Animal:</label>
+                <input type="text" id="animal" name="animal" required>
+                <input type="submit" value="¡Enviar!">
+            </form>
+        </body>
+        </html>
+    `;
+}
+
+function renderResultPage(animalName) {
+    const safeAnimalName = animalName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    return `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Animal Favorito - Vista 2</title>
+            <style>
+                body { font-family: sans-serif; margin: 50px; background-color: #f4f4f4; }
+                .content { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 600px; text-align: center; }
+                h1 { color: #333; }
+                p { font-size: 1.2em; color: #555; }
+                .animal-name { font-weight: bold; color: #007bff; font-size: 1.5em; display: block; margin-top: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class="content">
+                <h1>🎉 ¡Gracias por compartir!</h1>
+                <p>Tu animal favorito es:</p>
+                <span class="animal-name">${safeAnimalName}</span>
+                <p><a href="/">Volver a empezar</a></p>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
+const server = http.createServer((req, res) => {
+   
+    const parsedUrl = url.parse(req.url, true);
+    const path = parsedUrl.pathname;
+
+   
+    if (path === '/' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(renderFormPage());
+    }
+
+    else if (path === '/mostrar-animal' && req.method === 'POST') {
+        let body = '';
+
+       
+        req.on('data', chunk => {
+            body += chunk.toString(); 
+        });
+
+        
+        req.on('end', () => {
+            const formData = querystring.parse(body);
+            const animal = formData.animal || 'Animal no especificado';
+
+        
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(renderResultPage(animal));
+        });
+    }
+
+    else {
+        res.writeHead(404, { 'Content-Type': 'text/html' });
+        res.end('<h1>404 Not Found</h1><p>La ruta solicitada no existe.</p>');
+    }
+});
+
+const PORT = 3000;
+const HOST = 'localhost';
+
+server.listen(PORT, HOST, () => {
+    console.log(`🚀 Servidor en funcionamiento en http://${HOST}:${PORT}`);
+    console.log(`Abre tu navegador y visita: http://${HOST}:${PORT}`);
+});
