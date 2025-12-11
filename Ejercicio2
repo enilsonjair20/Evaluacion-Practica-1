@@ -1,0 +1,51 @@
+enum GeneroPelicula {
+    ACCION = "Acción",
+    COMEDIA = "Comedia",
+    DRAMA = "Drama",
+    CIENCIA_FICCION = "Ciencia Ficción",
+    TERROR = "Terror"
+}
+
+enum PaisPelicula {
+    USA = "Estados Unidos",
+    ESPANA = "España",
+    MEXICO = "México",
+    FRANCIA = "Francia",
+    JAPON = "Japón"
+}
+
+interface Pelicula {
+    titulo: string;
+    genero: GeneroPelicula; 
+    pais: PaisPelicula;     
+    anio: number;
+}
+
+const miPeliculaFavorita: Pelicula = {
+    titulo: "2001: Una Odisea del Espacio",
+    genero: GeneroPelicula.CIENCIA_FICCION,
+    pais: PaisPelicula.USA,
+    anio: 1968
+};
+
+const otraPelicula: Pelicula = {
+    titulo: "El Laberinto del Fauno",
+    genero: GeneroPelicula.DRAMA,
+    pais: PaisPelicula.ESPANA,
+    anio: 2006
+};
+
+function mostrarDetalles(pelicula: Pelicula): void {
+    console.log("--- Detalle de la Película ---");
+    console.log(`Título: ${pelicula.titulo}`);
+    
+    
+    console.log(`Género: ${pelicula.genero}`); 
+    console.log(`País de Origen: ${pelicula.pais}`);
+    console.log(`Año: ${pelicula.anio}`);
+    console.log("-----------------------------\n");
+}
+
+console.log("🎬 Listado de Películas:\n");
+mostrarDetalles(miPeliculaFavorita);
+mostrarDetalles(otraPelicula);
